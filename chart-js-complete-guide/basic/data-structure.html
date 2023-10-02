@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chart.js, the Missing Manual</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      .chartMenu {
+        width: 100vw;
+        height: 40px;
+        background: #1a1a1a;
+        color: rgba(75, 192, 192, 1);
+      }
+      .chartMenu p {
+        padding: 10px;
+        font-size: 20px;
+      }
+      .chartCard {
+        width: 100vw;
+        height: calc(100vh - 40px);
+        background: rgba(75, 192, 192, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chartBox {
+        width: 600px;
+        padding: 20px;
+        border-radius: 20px;
+        border: solid 3px rgba(75, 192, 192, 1);
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chartMenu">
+      <p>Chart JS 3.6.0</p>
+    </div>
+    <div class="chartCard">
+      <div class="chartBox">
+        <canvas id="myChart"></canvas>
+        <button onclick="changeFinancials('tax')">Tax</button>
+        <button onclick="changeFinancials('cost')">Cost</button>
+        <button onclick="changeFinancials('budget')">Budget</button>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      const departmentData = ["Sales", "Marketing", "HR", "IT"];
+      const costData = [960, 666, 333, 999];
+      const budgetData = [500, 1200, 800, 100];
+      const taxData = [250, 500, 1200, 1000];
+
+      const departmentInfo = departmentData.map((el, i) => {
+        let departmentDataset = {};
+
+        departmentDataset.department = el;
+        departmentDataset.financials = {};
+        departmentDataset.financials.cost = costData[i];
+        departmentDataset.financials.budget = budgetData[i];
+        departmentDataset.financials.budget = budgetData[i];
+        departmentDataset.financials.tax = taxData[i];
+
+        return departmentDataset;
+      });
+
+      // data block
+      const data = {
+        // labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        datasets: [
+          {
+            // data: [12, 19, 3, 5, 2, 3],
+            data: departmentInfo,
+            backgroundColor: ["rgba(255, 99, 100, 0.2)"],
+            borderColor: ["rgba(255, 99, 100, 1)"],
+          },
+        ],
+      };
+
+      // config block
+      const config = {
+        label: "Tax",
+        type: "bar",
+        data: data,
+        options: {
+          indexAxis: "y",
+          borderWidth: 1,
+          parsing: {
+            yAxisKey: "department",
+            xAxisKey: "financials.tax",
+          },
+        },
+      };
+
+      // init render block
+      const myChart = new Chart(document.getElementById("myChart"), config);
+
+      const changeFinancials = (term) => {
+        myChart.config.options.parsing.xAxisKey = `financials.${term}`;
+        myChart.update();
+      };
+    </script>
+  </body>
+</html>

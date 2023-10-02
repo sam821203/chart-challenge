@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chart.js, the Missing Manual</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      .chartMenu {
+        width: 100vw;
+        height: 40px;
+        background: #1a1a1a;
+        color: rgba(75, 192, 192, 1);
+      }
+      .chartMenu p {
+        padding: 10px;
+        font-size: 20px;
+      }
+      .chartCard {
+        width: 100vw;
+        height: calc(100vh - 40px);
+        background: rgba(75, 192, 192, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chartBox {
+        width: 800px;
+        padding: 20px;
+        border-radius: 20px;
+        border: solid 3px rgba(75, 192, 192, 1);
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chartMenu">
+      <p>Chart JS 3.6.0</p>
+    </div>
+    <div class="chartCard">
+      <div class="chartBox">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+
+    <script>
+      // data block
+      const data = {
+        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        datasets: [
+          {
+            label: "# of Votes",
+            data: [
+              [0, 12],
+              [0, 19],
+              [0, 4],
+              [0, 8],
+              [0, 3],
+              [0, 9],
+            ],
+            backgroundColor: ["rgba(255, 99, 102, 0.2)"],
+            borderColor: ["rgba(255, 99, 102, 1)"],
+            borderWidth: 1,
+          },
+          {
+            label: "Arrow Bar",
+            data: [
+              [12, 19],
+              [19, 4],
+              [4, 8],
+              [8, 3],
+              [3, 9],
+            ],
+            backgroundColor: ["rgba(0, 0, 0, 0.5)"],
+            borderColor: ["rgba(0, 0, 0, 0.5)"],
+            barPercentage: 0.05,
+          },
+        ],
+      };
+
+      // barGrowthIndicator plugin
+      const barGrowthIndicator = {
+        id: "barGrowthIndicator",
+        afterDatasetsDraw(chart, scales, options) {
+          const {
+            ctx,
+            scales: { x, y },
+          } = chart;
+
+          const deltaPercentage = [];
+
+          for (let i = 0; i < chart._metasets[0]._parsed.length - 1; i++) {
+            let plus = 1 + i;
+            const delta = chart._metasets[0]._parsed[i].y;
+            const basic = chart._metasets[0]._parsed[plus].y;
+            let percentage = (delta / basic) * 100;
+            percentage = percentage - 100;
+
+            deltaPercentage.push(percentage.toFixed(1));
+          }
+
+          if (chart._metasets[1].hidden !== true) {
+            for (let a = 0; a < deltaPercentage.length; a++) {
+              const startPoint = chart._metasets[1]._parsed[a]._custom.start;
+              const endPoint = chart._metasets[1]._parsed[a]._custom.end;
+
+              if (endPoint >= startPoint) {
+                // triangle
+                ctx.beginPath();
+                ctx.moveTo(
+                  chart.getDatasetMeta(1).data[a].x,
+                  chart.getDatasetMeta(1).data[a].y - 2
+                );
+                ctx.lineTo(
+                  chart.getDatasetMeta(1).data[a].x - 3,
+                  chart.getDatasetMeta(1).data[a].y + 6
+                );
+                ctx.lineTo(
+                  chart.getDatasetMeta(1).data[a].x + 3,
+                  chart.getDatasetMeta(1).data[a].y + 6
+                );
+
+                // restore 可以用來清除紀錄
+                ctx.fillStyle = "black";
+                ctx.fill();
+                ctx.restore();
+
+                ctx.font = "10px Arial";
+                ctx.fillStyle = "green";
+                ctx.textAlign = "center";
+                ctx.fillText(
+                  deltaPercentage[a] + "%",
+                  chart.getDatasetMeta(1).data[a].x + 2.5,
+                  chart.getDatasetMeta(1).data[a].y - 10
+                );
+                ctx.restore();
+              }
+
+              if (endPoint < startPoint) {
+                let yStart = a + 1;
+
+                ctx.beginPath();
+                ctx.moveTo(
+                  chart.getDatasetMeta(1).data[a].x,
+                  chart.getDatasetMeta(0).data[yStart].y + 3
+                );
+                ctx.lineTo(
+                  chart.getDatasetMeta(1).data[a].x - 3,
+                  chart.getDatasetMeta(0).data[yStart].y - 5
+                );
+                ctx.lineTo(
+                  chart.getDatasetMeta(1).data[a].x + 3,
+                  chart.getDatasetMeta(0).data[yStart].y - 5
+                );
+
+                ctx.fillStyle = "black";
+                ctx.fill();
+                ctx.restore();
+
+                ctx.font = "10px Arial";
+                ctx.fillStyle = "red";
+                ctx.textAlign = "center";
+                ctx.fillText(
+                  deltaPercentage[a] + "%",
+                  chart.getDatasetMeta(1).data[a].x + 2.5,
+                  chart.getDatasetMeta(0).data[yStart].y + 12
+                );
+                ctx.restore();
+              }
+            }
+          }
+        },
+      };
+
+      // config block
+      const config = {
+        type: "bar",
+        data: data,
+        options: {
+          plugins: {
+            tooltip: {
+              filter: (tooltipItem) => {
+                return tooltipItem.datasetIndex === 0;
+              },
+            },
+          },
+          scales: {
+            y: {
+              grace: "5%",
+              beginAtZero: true,
+            },
+          },
+        },
+        plugins: [barGrowthIndicator],
+      };
+
+      // init render block
+      const myChart = new Chart(document.getElementById("myChart"), config);
+    </script>
+  </body>
+</html>

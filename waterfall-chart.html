@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chart.js, the Missing Manual</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      .chartMenu {
+        width: 100vw;
+        height: 40px;
+        background: #1a1a1a;
+        color: rgba(75, 192, 192, 1);
+      }
+      .chartMenu p {
+        padding: 10px;
+        font-size: 20px;
+      }
+      .chartCard {
+        width: 100vw;
+        height: calc(100vh - 40px);
+        background: rgba(75, 192, 192, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chartBox {
+        width: 700px;
+        padding: 20px;
+        border-radius: 20px;
+        border: solid 3px rgba(75, 192, 192, 1);
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chartMenu">
+      <p>Chart JS 3.6.0</p>
+    </div>
+    <div class="chartCard">
+      <div class="chartBox">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"
+      integrity="sha512-R/QOHLpV1Ggq22vfDAWYOaMd5RopHrJNMxi8/lJu8Oihwi4Ho4BRFeiMiCefn9rasajKjnx9/fTQ/xkWnkDACg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script> -->
+
+    <script>
+      const barBackgroundColor = () => {
+        return (ctx) => {
+          const start = ctx.parsed._custom.start;
+          const end = ctx.parsed._custom.end;
+
+          let barBackgroundColor =
+            start <= end
+              ? "rgba(75, 192, 192, 0.3)"
+              : start > end
+              ? "rgba(255, 99, 132, 0.3)"
+              : "rgba(0, 0, 0, 0.3)";
+
+          if (
+            ctx.dataIndex === 0 ||
+            ctx.dataIndex === ctx.chart.config.data.datasets[0].data.length - 1
+          )
+            barBackgroundColor = "rgba(0, 0, 0, 0.3)";
+
+          return barBackgroundColor;
+        };
+      };
+
+      const barBorderColor = () => {
+        return (ctx) => {
+          const start = ctx.parsed._custom.start;
+          const end = ctx.parsed._custom.end;
+
+          let barBorderColor =
+            start <= end
+              ? "rgba(75, 192, 192, 1)"
+              : start > end
+              ? "rgba(255, 99, 132, 1)"
+              : "rgba(0, 0, 0, 1)";
+
+          if (
+            ctx.dataIndex === 0 ||
+            ctx.dataIndex === ctx.chart.config.data.datasets[0].data.length - 1
+          )
+            barBorderColor = "rgba(0, 0, 0, 1)";
+
+          return barBorderColor;
+        };
+      };
+
+      // data block
+      const data = {
+        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange", "Next"],
+        datasets: [
+          {
+            label: "# of Votes",
+            //data: [12, 19, 3, 5, 2, 3],
+
+            data: [
+              [12, 19],
+              [19, 3],
+              [3, 5],
+              [5, 2],
+              [2, 4],
+              [4, 15],
+              [15, 11],
+            ],
+            backgroundColor: barBackgroundColor(),
+            borderColor: barBorderColor(),
+            borderWidth: 1,
+            borderSkipped: false,
+          },
+        ],
+      };
+
+      // waterfallLines plugin
+      const waterfallLines = {
+        id: "waterfallLines",
+        beforeDraw(chart, args, options) {
+          const {
+            ctx,
+            config,
+            scales: { x, y },
+          } = chart;
+
+          ctx.save();
+          ctx.strokeStyle = options.lineColor;
+          ctx.setLineDash([options.lineStyle1, options.lineStyle2]);
+
+          for (
+            let i = 0;
+            i < config._config.data.datasets[0].data.length - 1;
+            i++
+          ) {
+            ctx.strokeRect(
+              x.getPixelForValue(i),
+              y.getPixelForValue(config._config.data.datasets[0].data[i][1]),
+              x.getPixelForValue(0.5),
+              0
+            );
+          }
+        },
+      };
+
+      // config block
+      const config = {
+        type: "bar",
+        data: data,
+        options: {
+          plugins: {
+            // datalabels 是 ChartDataLabels 的 id
+            datalabels: {
+              formatter: (value) => {
+                const votes = Math.abs(value[1] - value[0]);
+                return `Votes: ${votes}`;
+              },
+            },
+            waterfallLines: {
+              lineColor: "#2e2e2e",
+              lineStyle1: 5,
+              lineStyle2: 6,
+            },
+            tooltip: {
+              enabled: false,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+        plugins: [waterfallLines, ChartDataLabels],
+      };
+
+      // init render block
+      const myChart = new Chart(document.getElementById("myChart"), config);
+    </script>
+  </body>
+</html>

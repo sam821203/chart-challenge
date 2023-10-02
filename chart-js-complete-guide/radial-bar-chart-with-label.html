@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chart.js, the Missing Manual</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      .chartMenu {
+        width: 100vw;
+        height: 40px;
+        background: #1a1a1a;
+        color: rgba(75, 192, 192, 1);
+      }
+      .chartMenu p {
+        padding: 10px;
+        font-size: 20px;
+      }
+      .chartCard {
+        width: 100vw;
+        height: calc(100vh - 40px);
+        background: rgba(75, 192, 192, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chartBox {
+        width: 500px;
+        padding: 20px;
+        border-radius: 20px;
+        border: solid 3px rgba(75, 192, 192, 1);
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chartMenu">
+      <p>Chart JS 3.6.0</p>
+    </div>
+    <div class="chartCard">
+      <div class="chartBox">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.0/dist/chart.umd.min.js"></script>
+
+    <script>
+      // data block
+      const highestVal = 20;
+      const data = {
+        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        datasets: [
+          {
+            label: "Red",
+            data: [highestVal],
+            backgroundColor: ["rgba(255, 99, 132, 0.2)"],
+            borderColor: ["rgba(255, 99, 132, 1)"],
+            borderWidth: 1,
+            circumference: (ctx) => {
+              return (ctx.dataset.data[0] / highestVal) * 270;
+            },
+          },
+          {
+            label: "Blue",
+            data: [15],
+            backgroundColor: ["rgba(54, 162, 235, 0.2)"],
+            borderColor: ["rgba(54, 162, 235, 1)"],
+            borderWidth: 1,
+            circumference: (ctx) => {
+              return (ctx.dataset.data[0] / highestVal) * 270;
+            },
+          },
+          {
+            label: "Yellow",
+            data: [3],
+            backgroundColor: ["rgba(255, 206, 86, 0.2)"],
+            borderColor: ["rgba(255, 206, 86, 1)"],
+            borderWidth: 1,
+            circumference: (ctx) => {
+              return (ctx.dataset.data[0] / highestVal) * 270;
+            },
+          },
+        ],
+      };
+
+      const labelsRadialBar = {
+        id: "labelsRadialBar",
+        afterDatasetDraw(chart, args, plugins) {
+          const { ctx, data } = chart;
+
+          ctx.save();
+
+          for (let i = 0; i < data.datasets.length; i++) {
+            const xCenter = chart.getDatasetMeta(i).data[0].x;
+            const yCenter = chart.getDatasetMeta(i).data[0].y;
+            const outerRadius = chart.getDatasetMeta(i).data[0].outerRadius;
+            const innerRadius = chart.getDatasetMeta(i).data[0].innerRadius;
+            const between = (outerRadius - innerRadius) / 2;
+
+            ctx.font = "12px sans-serif";
+            ctx.fillStyle = data.datasets[i].borderColor;
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+            ctx.fillText(
+              data.datasets[i].label,
+              xCenter - 10,
+              yCenter - outerRadius + between
+            );
+          }
+        },
+      };
+
+      const radialScale = {
+        id: "radialScale",
+        afterDatasetDraw(chart, args, plugins) {
+          const { ctx, data } = chart;
+          const xCenter = chart.getDatasetMeta(0).data[0].x;
+          const yCenter = chart.getDatasetMeta(0).data[0].y;
+          const outerRadius = chart.getDatasetMeta(0).data[0].outerRadius + 20;
+          const dataPoints = data.datasets.map(
+            (dataset, index) => dataset.data[0]
+          );
+          const max = Math.max(...dataPoints);
+          const increment = max / 6;
+          const labelArray = Array.from(
+            { length: 7 },
+            (_, index) => increment * index
+          );
+          const startAngle = -90;
+          const anglePosition = [-90, -45, 0, 45, 90, 135, 180];
+          const labelPosition = anglePosition.map((angle) => {
+            const angleRadian = (angle * Math.PI) / 180;
+            const x = xCenter + outerRadius * Math.cos(angleRadian);
+            const y = yCenter + outerRadius * Math.sin(angleRadian);
+            return { x, y };
+          });
+
+          ctx.save();
+
+          labelArray.forEach((label, index) => {
+            ctx.fillStyle = "gray";
+            ctx.textAlign = "center";
+            ctx.fillText(
+              label.toFixed(1),
+              labelPosition[index].x,
+              labelPosition[index].y
+            );
+          });
+        },
+      };
+
+      const radialGrid = {
+        id: "radialGrid",
+        beforeDatasetsDraw(chart, args, plugins) {
+          const { ctx } = chart;
+
+          const datasetLength = data.datasets.length - 1;
+          const angle = Math.PI / 180;
+          const xCenter = chart.getDatasetMeta(0).data[0].x;
+          const yCenter = chart.getDatasetMeta(0).data[0].y;
+          const outerRadius = chart.getDatasetMeta(0).data[0].outerRadius;
+          const innerRadius = chart.getDatasetMeta(2).data[0].innerRadius;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+          ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+          ctx.moveTo(xCenter, yCenter - innerRadius + 3);
+          ctx.lineTo(xCenter, yCenter - outerRadius - 3);
+
+          ctx.arc(
+            xCenter,
+            yCenter,
+            outerRadius + 3,
+            angle * -90,
+            angle * 180,
+            false
+          );
+          ctx.lineTo(xCenter - innerRadius + 3, yCenter);
+          ctx.arc(
+            xCenter,
+            yCenter,
+            innerRadius,
+            angle * 180,
+            angle * -90,
+            true
+          );
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fill();
+        },
+      };
+      // config block
+      const config = {
+        type: "doughnut",
+        data: data,
+        options: {
+          layout: {
+            padding: 40,
+          },
+          borderRadius: 10,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            tooltip: {
+              enabled: false,
+            },
+          },
+        },
+        plugins: [labelsRadialBar, radialScale, radialGrid],
+      };
+
+      // init render block
+      const myChart = new Chart(document.getElementById("myChart"), config);
+    </script>
+  </body>
+</html>

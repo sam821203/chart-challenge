@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chart.js, the Missing Manual</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      .chartCard {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chartBox {
+        width: 80%;
+        padding: 80px;
+        border-radius: 20px;
+        border: solid 1px #ccc;
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chartCard">
+      <div class="chartBox">
+        <canvas id="myChart"></canvas>
+        <button onclick="changeFinancials('tax')">Tax</button>
+        <button onclick="changeFinancials('cost')">Cost</button>
+        <button onclick="changeFinancials('budget')">Budget</button>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      const departmentData = ["Sales", "Marketing", "HR", "IT"];
+      const costData = [960, 666, 333, 999];
+      const budgetData = [500, 1200, 800, 100];
+      const taxData = [250, 500, 1200, 1000];
+
+      const departmentInfo = departmentData.map((el, i) => {
+        let departmentDataset = {};
+
+        departmentDataset.department = el;
+        departmentDataset.financials = {};
+        departmentDataset.financials.cost = costData[i];
+        departmentDataset.financials.budget = budgetData[i];
+        departmentDataset.financials.budget = budgetData[i];
+        departmentDataset.financials.tax = taxData[i];
+
+        return departmentDataset;
+      });
+      // console.log(departmentInfo);
+      // data block
+      const data = {
+        // labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        datasets: [
+          {
+            // data: [12, 19, 3, 5, 2, 3],
+            data: departmentInfo,
+            backgroundColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(255, 206, 86, 1)",
+              "rgba(75, 192, 192, 1)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+              "rgba(255, 206, 86, 0.2)",
+              "rgba(75, 192, 192, 0.2)",
+            ],
+            borderWidth: 0,
+            barPercentage: 0.15,
+            // borderSkipped: false,
+            // borderRadius: 10,
+            categoryPercentage: 0.8,
+          },
+        ],
+      };
+
+      // roundedProgressBar block
+      const roundedProgressBar = {
+        id: "roundedProgressBar",
+        beforeDatasetsDraw(chart, args, pluginsOptions) {
+          const {
+            ctx,
+            data,
+            chartArea: { top, bottom, left, right, width, height },
+            scales: { x, y },
+          } = chart;
+
+          ctx.save();
+
+          const segmentHeight = height / data.labels.length;
+          chart.getDatasetMeta(0).data.forEach((dataPoint, index) => {
+            dataPoint.y = top + segmentHeight * (index + 0.5);
+
+            // text label
+            // ctx.font = "13px sans-serif";
+            // ctx.fillStyle = "rgba(102, 102, 102, 1)";
+            // ctx.textBaseline = "middle";
+            // ctx.textAlign = "right";
+            // ctx.fillText(data.labels[index], left - 20, dataPoint.y);
+
+            // text value
+            // ctx.font = "bold 15px sans-serif";
+            // ctx.fillStyle = dataPoint.options.backgroundColor;
+            // ctx.textBaseline = "middle";
+            // ctx.textAlign = "right";
+            // ctx.fillText(data.datasets[0].data[index], right, dataPoint.y - 18);
+
+            // background shadow
+            // ctx.beginPath();
+            // ctx.strokeStyle = dataPoint.options.borderColor;
+            // ctx.fillStyle = dataPoint.options.borderColor;
+            // // ctx.lineJoin = "round";
+            // ctx.lineWidth = dataPoint.height;
+            // ctx.strokeRect(
+            //   left + dataPoint.height / 2,
+            //   dataPoint.y,
+            //   width - dataPoint.height,
+            //   1
+            // );
+
+            ctx.restore();
+          });
+        },
+      };
+
+      // config block
+      const config = {
+        label: "Tax",
+        type: "bar",
+        data: data,
+        options: {
+          indexAxis: "y",
+          // plugins: {
+          //   legend: {
+          //     display: false,
+          //   },
+          // },
+          // layout: {
+          //   padding: {
+          //     left: 80,
+          //     right: 40,
+          //   },
+          // },
+          scales: {
+            x: {
+              grid: {
+                // display: false,
+                // drawBorder: false,
+              },
+              ticks: {
+                // display: false,
+              },
+            },
+            y: {
+              beginAtZero: true,
+              grid: {
+                display: false,
+                drawBorder: false,
+              },
+              ticks: {
+                // display: false,
+              },
+            },
+          },
+          borderWidth: 1,
+          parsing: {
+            yAxisKey: "department",
+            xAxisKey: "financials.tax",
+          },
+        },
+        plugins: [roundedProgressBar],
+      };
+
+      // init render block
+      const myChart = new Chart(document.getElementById("myChart"), config);
+
+      const changeFinancials = (term) => {
+        myChart.config.options.parsing.xAxisKey = `financials.${term}`;
+        myChart.update();
+      };
+    </script>
+  </body>
+</html>

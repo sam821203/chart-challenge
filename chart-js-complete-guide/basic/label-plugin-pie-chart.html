@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chart.js, the Missing Manual</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      .chartMenu {
+        width: 100vw;
+        height: 40px;
+        background: #1a1a1a;
+        color: rgba(75, 192, 192, 1);
+      }
+      .chartMenu p {
+        padding: 10px;
+        font-size: 20px;
+      }
+      .chartCard {
+        width: 100vw;
+        height: calc(100vh - 40px);
+        background: rgba(75, 192, 192, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chartBox {
+        width: 500px;
+        padding: 20px;
+        border-radius: 20px;
+        border: solid 3px rgba(75, 192, 192, 1);
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chartMenu">
+      <p>Chart JS 3.6.0</p>
+    </div>
+    <div class="chartCard">
+      <div class="chartBox">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+    <script src="https://unpkg.com/chart.js-plugin-labels-dv/dist/chartjs-plugin-labels.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <script>
+      // data block
+      const data = {
+        labels: ["Red 1", "Red 2", "Red 3", "Blue"],
+        datasets: [
+          {
+            label: "# of Votes",
+            data: [12, 19, 3, 5],
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(255, 99, 132, 1)",
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+            ],
+            borderWidth: 1,
+            offset: [20, 20, 20, 0],
+          },
+        ],
+      };
+
+      // plugin block
+      const legendMargin = {
+        id: "legendMargin",
+        beforeInit(chart, legend, option) {
+          // legend height
+          const fitVal = chart.legend.fit;
+
+          chart.legend.fit = function fit() {
+            fitVal.bind(chart.legend)();
+            return (this.height += 16);
+          };
+        },
+      };
+
+      // config block
+      const config = {
+        type: "pie",
+        data: data,
+        options: {
+          layout: {
+            padding: {
+              top: 20,
+              bottom: 20,
+            },
+          },
+          plugins: {
+            labels: {
+              // render 'label', 'value', 'percentage', 'image' or custom function, default is 'percentage'
+              render: (arguments) => {
+                return `${arguments.label}: ${arguments.percentage}%`;
+              },
+              // precision for percentage, default is 0
+              precision: 0,
+              position: "outside",
+              fontSize: 12,
+              fontStyle: "bolder",
+              fontColor: [
+                data.datasets[0].borderColor[0],
+                data.datasets[0].borderColor[1],
+                data.datasets[0].borderColor[2],
+                data.datasets[0].borderColor[3],
+              ],
+              // arc: true,
+              overlap: true,
+              textMargin: 14,
+            },
+            legend: {
+              labels: {
+                display: true,
+                padding: 10,
+              },
+            },
+          },
+        },
+        plugins: [ChartDataLabels, legendMargin],
+      };
+
+      // init render block
+      const myChart = new Chart(document.getElementById("myChart"), config);
+    </script>
+  </body>
+</html>

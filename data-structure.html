@@ -10,6 +10,12 @@
         padding: 0;
         font-family: sans-serif;
       }
+      .main-title {
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 12px;
+      }
       .chartCard {
         width: 100vw;
         height: 100vh;
@@ -23,7 +29,7 @@
         border-radius: 20px;
         background: white;
       }
-      .button__group {
+      .button-group {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -46,8 +52,9 @@
   <body>
     <div class="chartCard">
       <div class="chartBox">
+        <div id="mainTitle" class="main-title">Tax</div>
         <canvas id="myChart"></canvas>
-        <div class="button__group">
+        <div class="button-group">
           <button onclick="changeFinancials('tax')">Tax</button>
           <button onclick="changeFinancials('cost')">Cost</button>
           <button onclick="changeFinancials('budget')">Budget</button>
@@ -134,9 +141,11 @@
 
       // init render block
       const myChart = new Chart(document.getElementById("myChart"), config);
+      const mainTitle = document.getElementById("mainTitle");
 
       const changeFinancials = (term) => {
         myChart.config.options.parsing.xAxisKey = `financials.${term}`;
+        mainTitle.textContent = term.charAt(0).toUpperCase() + term.slice(1);
         myChart.update();
       };
     </script>

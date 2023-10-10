@@ -3,46 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chart.js, the Missing Manual</title>
+    <title>Chart.js challenge</title>
     <style>
       * {
         margin: 0;
         padding: 0;
         font-family: sans-serif;
       }
-      .chartMenu {
-        width: 100vw;
-        height: 40px;
-        background: #1a1a1a;
-        color: rgba(75, 192, 192, 1);
+      h1 {
+        color: rgb(57, 57, 57);
+        margin-bottom: 6px;
       }
-      .chartMenu p {
-        padding: 10px;
-        font-size: 20px;
+      p {
+        color: rgb(148, 148, 148);
+        margin-bottom: 24px;
       }
       .chartCard {
         width: 100vw;
-        height: calc(100vh - 40px);
-        background: rgba(75, 192, 192, 0.2);
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
       }
       .chartBox {
-        width: 500px;
-        padding: 20px;
+        width: 600px;
+        padding: 40px;
         border-radius: 20px;
-        border: solid 3px rgba(75, 192, 192, 1);
         background: white;
       }
     </style>
   </head>
   <body>
-    <div class="chartMenu">
-      <p>Chart JS 3.6.0</p>
-    </div>
     <div class="chartCard">
       <div class="chartBox">
+        <h1>Browser Market Share Worldwide</h1>
+        <p>Sept 2022 - Sept 2023</p>
         <canvas id="myChart"></canvas>
       </div>
     </div>
@@ -52,26 +47,26 @@
     <script>
       // data block
       const data = {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        labels: ["Chrome", "Safari", "Edge", "Firefox", "Samsung", "Other"],
         datasets: [
           {
-            label: "# of Votes",
-            data: [12, 19, 3, 5, 2, 3],
+            label: "Browser",
+            data: [63.45, 19.91, 5.29, 3.03, 2.31, 6.01],
             backgroundColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-              "rgba(255, 206, 86, 0.2)",
-              "rgba(75, 192, 192, 0.2)",
-              "rgba(153, 102, 255, 0.2)",
-              "rgba(255, 159, 64, 0.2)",
+              "rgba(0, 192, 0, 0.2)",
+              "rgba(255, 0, 0, 0.2)",
+              "rgba(121, 174, 255, 0.2)",
+              "rgba(228, 110, 13, 0.2)",
+              "rgba(48, 73, 251, 0.2)",
+              "rgba(128, 128, 128, 0.2)",
             ],
             borderColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-              "rgba(153, 102, 255, 1)",
-              "rgba(255, 159, 64, 1)",
+              "rgba(0, 192, 0, 1)",
+              "rgba(255, 0, 0, 1)",
+              "rgba(121, 174, 255, 1)",
+              "rgba(228, 110, 13, 1)",
+              "rgba(48, 73, 251, 1)",
+              "rgba(128, 128, 128, 1)",
             ],
             borderWidth: 1,
             cutout: "90%",
@@ -104,7 +99,7 @@
             ctx.fillStyle = color;
             ctx.textAlign = "center";
             ctx.fillText(
-              `${textLabel}: $${dataLabel}`,
+              `${textLabel}: ${dataLabel}%`,
               width / 2,
               height / 2 + 60 / 3
             );

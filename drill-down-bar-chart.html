@@ -163,16 +163,16 @@
       };
 
       const changeChart = (browser) => {
-        myChart.config.options.parsing.xAxisKey = "versionData.version";
-        myChart.config.options.parsing.yAxisKey = "versionData.views";
+        myChart.config.options.parsing.xAxisKey = "episodeData.episode";
+        myChart.config.options.parsing.yAxisKey = "episodeData.views";
 
         const vColor = [];
         const vViews = [];
 
-        const vLabel = browserData[browser].versionData.map((labels) => {
+        const vLabel = browserData[browser].episodeData.map((labels) => {
           vViews.push(labels.views);
           vColor.push(browserData[browser].color);
-          return labels.version;
+          return labels.episode;
         });
 
         myChart.config.data.labels = vLabel;

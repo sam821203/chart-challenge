@@ -12,15 +12,17 @@
       }
       .chartCard {
         width: 100vw;
-        height: calc(100vh - 40px);
+        height: 100vh;
+        /* height: auto; */
         display: flex;
         align-items: center;
         justify-content: center;
       }
       .chartBox {
         width: 72%;
-        padding: 100px;
-        border-radius: 12px;
+        height: auto;
+        padding: 40px 80px;
+        /* border-radius: 12px; */
         border: 1px solid #e7e7e7;
         /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */
         background: white;
@@ -37,129 +39,189 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
 
     <script>
-      // data block
-      const sortedData = [12, 19, 3, 5, 2, 3, 10].sort((a, b) => b - a);
+      let countriesNameArr = [];
+      let populationArr = [];
+      let flagsArr = [];
 
-      const data = {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange", "Red2"],
-        datasets: [
-          {
-            label: "# of Votes",
-            data: sortedData,
-            backgroundColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-              "rgba(153, 102, 255, 1)",
-              "rgba(255, 159, 64, 1)",
-              "rgba(255, 19, 64, 1)",
+      const getCountriesData = async () => {
+        try {
+          const res = await fetch("https://restcountries.com/v3.1/all");
+          const data = await res.json();
+
+          const filteredCountries = data.filter(
+            (country) => country.population > 100000000
+          );
+
+          const sortedCountries = filteredCountries.sort(
+            (a, b) => b.population - a.population
+          );
+
+          for (i = 0; i < sortedCountries.length; i++) {
+            const countryName = sortedCountries[i].name.common;
+            const countryFlag = sortedCountries[i].flags.svg;
+            const countryPopulation = sortedCountries[i].population;
+
+            countriesNameArr.push(countryName);
+            flagsArr.push(countryFlag);
+            populationArr.push(countryPopulation);
+          }
+          return Promise.resolve();
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          return Promise.reject(error);
+        }
+      };
+
+      getCountriesData()
+        .then(() => {
+          // data block
+          const data = {
+            labels: countriesNameArr,
+            datasets: [
+              {
+                label: "# of Votes",
+                data: populationArr,
+                backgroundColor: ["rgba(0, 0, 0, 0.2)"],
+                borderColor: ["rgba(0, 0, 0, 0.05)"],
+                borderWidth: 0,
+                barPercentage: 0.2,
+                borderSkipped: false,
+                borderRadius: 10,
+                categoryPercentage: 0.8,
+                image: flagsArr,
+              },
             ],
-            borderColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-              "rgba(255, 206, 86, 0.2)",
-              "rgba(75, 192, 192, 0.2)",
-              "rgba(153, 102, 255, 0.2)",
-              "rgba(255, 159, 64, 0.2)",
-              "rgba(255, 19, 64, 0.2)",
-            ],
-            borderWidth: 0,
-            barPercentage: 0.2,
-            borderSkipped: false,
-            borderRadius: 10,
-            categoryPercentage: 0.8,
-          },
-        ],
-      };
+          };
 
-      // roundedProgressBar block
-      const roundedProgressBar = {
-        id: "roundedProgressBar",
-        beforeDatasetsDraw(chart, args, pluginsOptions) {
-          const {
-            ctx,
-            data,
-            chartArea: { top, bottom, left, right, width, height },
-            scales: { x, y },
-          } = chart;
+          // imageItems block
+          const imageItems = {
+            id: "imageItems",
+            beforeDatasetsDraw(chart, args, pluginOptions) {
+              const {
+                ctx,
+                data,
+                options,
+                scales: { x, y },
+              } = chart;
 
-          ctx.save();
+              ctx.save();
 
-          const segmentHeight = height / data.labels.length;
-          chart.getDatasetMeta(0).data.forEach((dataPoint, index) => {
-            dataPoint.y = top + segmentHeight * (index + 0.5);
+              const imageSize = options.layout.padding.left;
 
-            // text label
-            ctx.font = "12px sans-serif";
-            ctx.fillStyle = "rgba(102, 102, 102, 1)";
-            ctx.textBaseline = "middle";
-            ctx.textAlign = "left";
-            ctx.fillText(data.labels[index], left, dataPoint.y - 18);
-
-            // text value
-            ctx.font = "bold 15px sans-serif";
-            ctx.fillStyle = dataPoint.options.backgroundColor;
-            ctx.textBaseline = "middle";
-            ctx.textAlign = "right";
-            ctx.fillText(data.datasets[0].data[index], right, dataPoint.y - 18);
-
-            // background shadow
-            ctx.beginPath();
-            ctx.strokeStyle = dataPoint.options.borderColor;
-            ctx.fillStyle = dataPoint.options.borderColor;
-            ctx.lineJoin = "round";
-            ctx.lineWidth = dataPoint.height;
-            ctx.strokeRect(
-              left + dataPoint.height / 2,
-              dataPoint.y,
-              width - dataPoint.height,
-              1
-            );
-
-            ctx.restore();
-          });
-        },
-      };
-
-      // config block
-      const config = {
-        type: "bar",
-        data: data,
-        options: {
-          indexAxis: "y",
-          plugins: {
-            legend: {
-              display: false,
+              data.datasets[0].image.forEach((imageLink, index) => {
+                const flagImage = new Image();
+                flagImage.src = imageLink;
+                ctx.drawImage(
+                  flagImage,
+                  0,
+                  y.getPixelForValue(index) - imageSize / 2,
+                  imageSize,
+                  imageSize * 0.66
+                );
+              });
             },
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false,
-                drawBorder: false,
-              },
-              ticks: {
-                display: false,
-              },
-            },
-            y: {
-              beginAtZero: true,
-              grid: {
-                display: false,
-                drawBorder: false,
-              },
-              ticks: {
-                display: false,
-              },
-            },
-          },
-        },
-        plugins: [roundedProgressBar],
-      };
+          };
 
-      // init render block
-      const myChart = new Chart(document.getElementById("myChart"), config);
+          // roundedProgressBar block
+          const roundedProgressBar = {
+            id: "roundedProgressBar",
+            beforeDatasetsDraw(chart, args, pluginsOptions) {
+              const {
+                ctx,
+                data,
+                chartArea: { top, bottom, left, right, width, height },
+                scales: { x, y },
+              } = chart;
+
+              ctx.save();
+
+              const segmentHeight = height / data.labels.length;
+              chart.getDatasetMeta(0).data.forEach((dataPoint, index) => {
+                dataPoint.y = top + segmentHeight * (index + 0.5);
+
+                // text label
+                ctx.font = "14px sans-serif";
+                ctx.fillStyle = "rgba(102, 102, 102, 1)";
+                ctx.textBaseline = "top";
+                ctx.textAlign = "left";
+                ctx.fillText(data.labels[index], left, dataPoint.y - 22);
+
+                // text value
+                ctx.font = "bold 14px sans-serif";
+                ctx.fillStyle = dataPoint.options.backgroundColor;
+                ctx.textBaseline = "top";
+                ctx.textAlign = "right";
+                ctx.fillText(
+                  data.datasets[0].data[index].toLocaleString(),
+                  right,
+                  dataPoint.y - 22
+                );
+
+                // background shadow
+                ctx.beginPath();
+                ctx.strokeStyle = dataPoint.options.borderColor;
+                ctx.fillStyle = dataPoint.options.borderColor;
+                ctx.lineJoin = "round";
+                ctx.lineWidth = dataPoint.height;
+                ctx.strokeRect(
+                  left + dataPoint.height / 2,
+                  dataPoint.y,
+                  width - dataPoint.height,
+                  1
+                );
+
+                ctx.restore();
+              });
+            },
+          };
+
+          // config block
+          const config = {
+            type: "bar",
+            data: data,
+            options: {
+              indexAxis: "y",
+              layout: {
+                padding: {
+                  left: 30,
+                },
+              },
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+              scales: {
+                x: {
+                  grid: {
+                    display: false,
+                    drawBorder: false,
+                  },
+                  ticks: {
+                    display: false,
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  grid: {
+                    display: false,
+                    drawBorder: false,
+                  },
+                  ticks: {
+                    display: false,
+                  },
+                },
+              },
+            },
+            plugins: [roundedProgressBar, imageItems],
+          };
+
+          // init render block
+          const myChart = new Chart(document.getElementById("myChart"), config);
+        })
+        .catch((error) => {
+          console.error("Error rendering chart:", error);
+        });
     </script>
   </body>
 </html>

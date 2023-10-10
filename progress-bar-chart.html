@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chart.js</title>
+    <title>Chart.js challenge</title>
     <style>
       * {
         margin: 0;
@@ -13,18 +13,14 @@
       .chartCard {
         width: 100vw;
         height: 100vh;
-        /* height: auto; */
         display: flex;
         align-items: center;
         justify-content: center;
       }
       .chartBox {
-        width: 72%;
+        width: 60%;
         height: auto;
-        padding: 40px 80px;
-        /* border-radius: 12px; */
-        border: 1px solid #e7e7e7;
-        /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); */
+        padding: 20px 80px;
         background: white;
       }
     </style>
@@ -144,7 +140,7 @@
                 ctx.fillStyle = "rgba(102, 102, 102, 1)";
                 ctx.textBaseline = "top";
                 ctx.textAlign = "left";
-                ctx.fillText(data.labels[index], left, dataPoint.y - 22);
+                ctx.fillText(data.labels[index], left, dataPoint.y - 18);
 
                 // text value
                 ctx.font = "bold 14px sans-serif";
@@ -154,7 +150,7 @@
                 ctx.fillText(
                   data.datasets[0].data[index].toLocaleString(),
                   right,
-                  dataPoint.y - 22
+                  dataPoint.y - 18
                 );
 
                 // background shadow
@@ -183,6 +179,7 @@
               indexAxis: "y",
               layout: {
                 padding: {
+                  top: 10,
                   left: 30,
                 },
               },

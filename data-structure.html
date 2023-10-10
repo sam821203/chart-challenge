@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chart.js, the Missing Manual</title>
+    <title>Chart.js challenge</title>
     <style>
       * {
         margin: 0;
@@ -18,11 +18,28 @@
         justify-content: center;
       }
       .chartBox {
-        width: 80%;
-        padding: 80px;
+        width: 40%;
+        padding: 40px 20px;
         border-radius: 20px;
-        border: solid 1px #ccc;
         background: white;
+      }
+      .button__group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 48px;
+      }
+      button {
+        width: 120px;
+        height: 36px;
+        margin-left: 12px;
+        margin-right: 12px;
+        color: rgba(149, 157, 165, 1);
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -30,19 +47,28 @@
     <div class="chartCard">
       <div class="chartBox">
         <canvas id="myChart"></canvas>
-        <button onclick="changeFinancials('tax')">Tax</button>
-        <button onclick="changeFinancials('cost')">Cost</button>
-        <button onclick="changeFinancials('budget')">Budget</button>
+        <div class="button__group">
+          <button onclick="changeFinancials('tax')">Tax</button>
+          <button onclick="changeFinancials('cost')">Cost</button>
+          <button onclick="changeFinancials('budget')">Budget</button>
+        </div>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-      const departmentData = ["Sales", "Marketing", "HR", "IT"];
-      const costData = [960, 666, 333, 999];
-      const budgetData = [500, 1200, 800, 100];
-      const taxData = [250, 500, 1200, 1000];
+      const departmentData = [
+        "行銷部門",
+        "企劃部門",
+        "營運部門",
+        "研發部門",
+        "設計部門",
+        "型錄部門",
+      ];
+      const taxData = [250, 500, 1100, 850, 420, 700];
+      const costData = [960, 666, 333, 564, 1300, 876];
+      const budgetData = [1000, 2400, 1600, 800, 3000, 2400, 4600];
 
       const departmentInfo = departmentData.map((el, i) => {
         let departmentDataset = {};
@@ -56,82 +82,25 @@
 
         return departmentDataset;
       });
-      // console.log(departmentInfo);
+
       // data block
       const data = {
-        // labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
         datasets: [
           {
-            // data: [12, 19, 3, 5, 2, 3],
             data: departmentInfo,
             backgroundColor: [
-              "rgba(255, 99, 132, 1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-            ],
-            borderColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-              "rgba(255, 206, 86, 0.2)",
-              "rgba(75, 192, 192, 0.2)",
+              "rgba(217, 156, 103, 0.6)",
+              "rgba(226, 171, 106, 0.6)",
+              "rgba(233, 186, 111, 0.6)",
+              "rgba(238, 202, 117, 0.6)",
+              "rgba(241, 219, 125, 0.6)",
+              "rgba(243, 236, 136, 0.6)",
             ],
             borderWidth: 0,
-            barPercentage: 0.15,
-            // borderSkipped: false,
-            // borderRadius: 10,
+            barPercentage: 0.5,
             categoryPercentage: 0.8,
           },
         ],
-      };
-
-      // roundedProgressBar block
-      const roundedProgressBar = {
-        id: "roundedProgressBar",
-        beforeDatasetsDraw(chart, args, pluginsOptions) {
-          const {
-            ctx,
-            data,
-            chartArea: { top, bottom, left, right, width, height },
-            scales: { x, y },
-          } = chart;
-
-          ctx.save();
-
-          const segmentHeight = height / data.labels.length;
-          chart.getDatasetMeta(0).data.forEach((dataPoint, index) => {
-            dataPoint.y = top + segmentHeight * (index + 0.5);
-
-            // text label
-            // ctx.font = "13px sans-serif";
-            // ctx.fillStyle = "rgba(102, 102, 102, 1)";
-            // ctx.textBaseline = "middle";
-            // ctx.textAlign = "right";
-            // ctx.fillText(data.labels[index], left - 20, dataPoint.y);
-
-            // text value
-            // ctx.font = "bold 15px sans-serif";
-            // ctx.fillStyle = dataPoint.options.backgroundColor;
-            // ctx.textBaseline = "middle";
-            // ctx.textAlign = "right";
-            // ctx.fillText(data.datasets[0].data[index], right, dataPoint.y - 18);
-
-            // background shadow
-            // ctx.beginPath();
-            // ctx.strokeStyle = dataPoint.options.borderColor;
-            // ctx.fillStyle = dataPoint.options.borderColor;
-            // // ctx.lineJoin = "round";
-            // ctx.lineWidth = dataPoint.height;
-            // ctx.strokeRect(
-            //   left + dataPoint.height / 2,
-            //   dataPoint.y,
-            //   width - dataPoint.height,
-            //   1
-            // );
-
-            ctx.restore();
-          });
-        },
       };
 
       // config block
@@ -141,35 +110,17 @@
         data: data,
         options: {
           indexAxis: "y",
-          // plugins: {
-          //   legend: {
-          //     display: false,
-          //   },
-          // },
-          // layout: {
-          //   padding: {
-          //     left: 80,
-          //     right: 40,
-          //   },
-          // },
-          scales: {
-            x: {
-              grid: {
-                // display: false,
-                // drawBorder: false,
-              },
-              ticks: {
-                // display: false,
-              },
+          plugins: {
+            legend: {
+              display: false,
             },
+          },
+          scales: {
             y: {
               beginAtZero: true,
               grid: {
                 display: false,
                 drawBorder: false,
-              },
-              ticks: {
-                // display: false,
               },
             },
           },
@@ -179,7 +130,6 @@
             xAxisKey: "financials.tax",
           },
         },
-        plugins: [roundedProgressBar],
       };
 
       // init render block

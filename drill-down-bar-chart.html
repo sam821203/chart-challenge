@@ -12,8 +12,7 @@
       }
       .chartCard {
         width: 100vw;
-        height: calc(100vh - 40px);
-        background: rgba(75, 192, 192, 0.2);
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -21,8 +20,6 @@
       .chartBox {
         width: 60%;
         padding: 20px;
-        border-radius: 20px;
-        border: solid 3px rgba(75, 192, 192, 1);
         background: white;
       }
     </style>
@@ -35,6 +32,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="browserdata.js"></script>
 
     <script>
       const coordinates = {
@@ -44,50 +42,11 @@
         right: 0,
       };
 
-      const browserData = [
-        {
-          browser: "Chrome",
-          color: "rgba(75, 192, 192, 1)",
-          users: 150,
-          marketshare: 70,
-          versionData: [
-            { version: "v5", users: 10 },
-            { version: "v6", users: 20 },
-            { version: "v7", users: 30 },
-            { version: "v8", users: 60 },
-            { version: "v9", users: 20 },
-          ],
-        },
-        {
-          browser: "FireFox",
-          color: "rgba(255, 26, 104, 1)",
-          users: 25,
-          marketshare: 24,
-          versionData: [
-            { version: "V3.1", users: 10 },
-            { version: "v3.2", users: 10 },
-            { version: "v3.3", users: 5 },
-          ],
-        },
-        {
-          browser: "Safari",
-          color: "rgba(54, 162, 235, 1)",
-          users: 30,
-          marketshare: 26,
-          versionData: [
-            { version: "Web 9", users: 10 },
-            { version: "Web 10", users: 10 },
-            { version: "Web 11", users: 10 },
-          ],
-        },
-      ];
-
       // data block
       const data = {
-        //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
         datasets: [
           {
-            label: "Browser Data Market Share",
+            label: "Anime Popularity",
             data: browserData,
             backgroundColor: [
               browserData[0].color,
@@ -100,6 +59,7 @@
               browserData[2].color,
             ],
             borderWidth: 1,
+            barPercentage: 0.8,
           },
         ],
       };
@@ -108,7 +68,7 @@
       const resetButton = {
         id: "resetButton",
         beforeDraw(chart, args, options) {
-          if (chart.data.datasets[0].label !== "Browser Data Market Share") {
+          if (chart.data.datasets[0].label !== "Anime Popularity") {
             const {
               ctx,
               chartArea: { top, bottom, left, right, width, height },
@@ -123,7 +83,7 @@
             const btnPaddingRight = btnPadding / 2;
 
             // background color
-            ctx.fillStyle = "rgba(75, 192, 192, 0.2)";
+            ctx.fillStyle = "rgba(34, 34, 34, 0.2)";
             ctx.fillRect(
               right - (textWidth + 2 + btnPadding),
               5,
@@ -132,13 +92,13 @@
             );
 
             // text
-            ctx.fillStyle = "rgba(75, 192, 192, 1)";
+            ctx.fillStyle = "rgba(34, 34, 34, 1)";
             ctx.font = "14px Arial";
             ctx.fillText(text, right - (textWidth + 2 + btnPaddingRight), 18);
 
             // border button
             ctx.lineWidth = thickBorder;
-            ctx.strokeStyle = "rgba(75, 192, 192, 1)";
+            ctx.strokeStyle = "rgba(34, 34, 34, 1)";
             ctx.strokeRect(
               right - (textWidth + 2 + btnPadding),
               5,
@@ -162,10 +122,7 @@
         data: data,
         options: {
           onHover: (event, chartElement) => {
-            if (
-              myChart.config.data.datasets[0].label ===
-              "Browser Data Market Share"
-            ) {
+            if (myChart.config.data.datasets[0].label === "Anime Popularity") {
               event.native.target.style.cursor = chartElement[0]
                 ? "pointer"
                 : "default";
@@ -175,7 +132,7 @@
           },
           parsing: {
             xAxisKey: "browser",
-            yAxisKey: "marketshare",
+            yAxisKey: "popularity",
           },
           scales: {
             y: {
@@ -191,9 +148,7 @@
       const myChart = new Chart(ctx, config);
 
       const clickHandler = (event) => {
-        if (
-          myChart.config.data.datasets[0].label === "Browser Data Market Share"
-        ) {
+        if (myChart.config.data.datasets[0].label === "Anime Popularity") {
           const bar = myChart.getElementsAtEventForMode(
             event,
             "nearest",
@@ -209,20 +164,20 @@
 
       const changeChart = (browser) => {
         myChart.config.options.parsing.xAxisKey = "versionData.version";
-        myChart.config.options.parsing.yAxisKey = "versionData.users";
+        myChart.config.options.parsing.yAxisKey = "versionData.views";
 
         const vColor = [];
-        const vUsers = [];
+        const vViews = [];
 
         const vLabel = browserData[browser].versionData.map((labels) => {
-          vUsers.push(labels.users);
+          vViews.push(labels.views);
           vColor.push(browserData[browser].color);
           return labels.version;
         });
 
         myChart.config.data.labels = vLabel;
         myChart.config.data.datasets[0].label = browserData[browser].browser;
-        myChart.config.data.datasets[0].data = vUsers;
+        myChart.config.data.datasets[0].data = vViews;
         myChart.config.data.datasets[0].backgroundColor = vColor;
         myChart.config.data.datasets[0].borderColor = vColor;
         myChart.update();
@@ -233,19 +188,19 @@
       // event handler =================================================================
       const resetChart = () => {
         myChart.config.options.parsing.xAxisKey = "browser";
-        myChart.config.options.parsing.yAxisKey = "marketshare";
+        myChart.config.options.parsing.yAxisKey = "popularity";
 
         const bColor = [];
-        const bMarketshare = [];
+        const bpopularity = [];
         const bLabel = browserData.map((browser) => {
-          bMarketshare.push(browser.marketshare);
+          bpopularity.push(browser.popularity);
           bColor.push(browser.color);
           return browser.browser;
         });
 
         myChart.config.data.labels = bLabel;
-        myChart.config.data.datasets[0].label = "Browser Data Market Share";
-        myChart.config.data.datasets[0].data = bMarketshare;
+        myChart.config.data.datasets[0].label = "Anime Popularity";
+        myChart.config.data.datasets[0].data = bpopularity;
         myChart.config.data.datasets[0].backgroundColor = bColor;
         myChart.config.data.datasets[0].borderColor = bColor;
         myChart.update();
@@ -255,9 +210,7 @@
         const x = mousemove.offsetX;
         const y = mousemove.offsetY;
 
-        if (
-          myChart.config.data.datasets[0].label !== "Browser Data Market Share"
-        ) {
+        if (myChart.config.data.datasets[0].label !== "Anime Popularity") {
           if (
             x > coordinates.left &&
             x < coordinates.right &&
@@ -275,9 +228,7 @@
         const x = click.offsetX;
         const y = click.offsetY;
 
-        if (
-          myChart.config.data.datasets[0].label !== "Browser Data Market Share"
-        ) {
+        if (myChart.config.data.datasets[0].label !== "Anime Popularity") {
           if (
             x > coordinates.left &&
             x < coordinates.right &&

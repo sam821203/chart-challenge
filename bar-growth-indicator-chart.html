@@ -3,44 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chart.js, the Missing Manual</title>
+    <title>Chart.js challenge</title>
     <style>
       * {
         margin: 0;
         padding: 0;
         font-family: sans-serif;
       }
-      .chartMenu {
-        width: 100vw;
-        height: 40px;
-        background: #1a1a1a;
-        color: rgba(75, 192, 192, 1);
-      }
-      .chartMenu p {
-        padding: 10px;
-        font-size: 20px;
-      }
       .chartCard {
         width: 100vw;
-        height: calc(100vh - 40px);
-        background: rgba(75, 192, 192, 0.2);
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
       }
       .chartBox {
-        width: 800px;
+        width: 880px;
         padding: 20px;
-        border-radius: 20px;
-        border: solid 3px rgba(75, 192, 192, 1);
         background: white;
       }
     </style>
   </head>
   <body>
-    <div class="chartMenu">
-      <p>Chart JS 3.6.0</p>
-    </div>
     <div class="chartCard">
       <div class="chartBox">
         <canvas id="myChart"></canvas>
@@ -52,10 +36,18 @@
     <script>
       // data block
       const data = {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        labels: [
+          "星期一",
+          "星期二",
+          "星期三",
+          "星期四",
+          "星期五",
+          "星期六",
+          "星期天",
+        ],
         datasets: [
           {
-            label: "# of Votes",
+            label: "漲跌/漲跌幅",
             data: [
               [0, 12],
               [0, 19],
@@ -63,6 +55,7 @@
               [0, 8],
               [0, 3],
               [0, 9],
+              [0, 14],
             ],
             backgroundColor: ["rgba(255, 99, 102, 0.2)"],
             borderColor: ["rgba(255, 99, 102, 1)"],
@@ -76,6 +69,7 @@
               [4, 8],
               [8, 3],
               [3, 9],
+              [9, 14],
             ],
             backgroundColor: ["rgba(0, 0, 0, 0.5)"],
             borderColor: ["rgba(0, 0, 0, 0.5)"],
@@ -185,9 +179,7 @@
         options: {
           plugins: {
             tooltip: {
-              filter: (tooltipItem) => {
-                return tooltipItem.datasetIndex === 0;
-              },
+              enabled: false,
             },
           },
           scales: {

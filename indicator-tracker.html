@@ -11,20 +11,9 @@
         padding: 0;
         font-family: sans-serif;
       }
-      .chartMenu {
-        width: 100vw;
-        height: 40px;
-        background: #1a1a1a;
-        color: rgba(75, 192, 192, 1);
-      }
-      .chartMenu p {
-        padding: 10px;
-        font-size: 20px;
-      }
       .chartCard {
         width: 100vw;
-        height: calc(100vh - 40px);
-        background: rgba(75, 192, 192, 0.2);
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -32,24 +21,44 @@
       .chartBox {
         width: 700px;
         padding: 20px;
-        border-radius: 20px;
-        border: solid 3px rgba(75, 192, 192, 1);
         background: white;
+      }
+      .status {
+        text-align: center;
+        margin-top: 60px;
+        margin-bottom: 20px;
+      }
+      .button-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 48px;
+      }
+      button {
+        width: 120px;
+        height: 36px;
+        margin-left: 12px;
+        margin-right: 12px;
+        color: rgba(149, 157, 165, 1);
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        cursor: pointer;
       }
     </style>
   </head>
   <body>
-    <div class="chartMenu">
-      <p>Chart JS 3.7.1</p>
-    </div>
     <div class="chartCard">
       <div class="chartBox">
         <canvas id="myChart"></canvas>
-        <button onclick="addValue(this)" value="20">Danger Zone</button>
-        <button onclick="addValue(this)" value="7">Success Zone</button>
-        <button onclick="addValue(this)" value="1">Reset Zone</button>
+        <p class="status">Status: <span id="status">...</span></p>
+        <div class="button-group">
+          <button onclick="addValue(this)" value="20">Danger Zone</button>
+          <button onclick="addValue(this)" value="7">Success Zone</button>
+          <button onclick="addValue(this)" value="1">Reset Zone</button>
+        </div>
       </div>
-      <p>Status: <span id="status">...</span></p>
     </div>
 
     <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
@@ -61,7 +70,7 @@
         labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
         datasets: [
           {
-            label: "# of Votes",
+            label: "Marketing",
             data: [12, 19, 3, 5, 2, 13],
             backgroundColor: [
               "rgba(255, 99, 132, 0.2)",
@@ -132,7 +141,7 @@
 
       const addValue = (btn) => {
         myChart.data.datasets[0].data.push(btn.value);
-        myChart.data.labels.push("New Value");
+        myChart.data.labels.push("New");
         myChart.update();
       };
 

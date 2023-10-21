@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <style>
+      #map {
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Where is the ISS ?</h1>
+    <p>
+      latitude: <span id="lat"></span>°<br />
+      longitude: <span id="log"></span>°
+    </p>
+    <div id="map"></div>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script>
+      const api_url = "https://api.wheretheiss.at/v1/satellites/25544";
+      let firstTime = true;
+
+      // Making map and tiles
+      // setView 的第一個參數是第一次載入時的經緯度中心位置
+      // setView 的第二個參數是 zoom level
+      const map = L.map("map").setView([0, 0], 1);
+      const attribution =
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+      const tilesUrl = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+      const tiles = L.tileLayer(tilesUrl, { attribution });
+
+      // Making marker
+      const issIcon = L.icon({
+        iconUrl: "./iss.svg",
+        iconSize: [36, 36],
+        iconAnchor: [25, 16],
+      });
+      const marker = L.marker([0, 0], { icon: issIcon }).addTo(map);
+
+      tiles.addTo(map);
+
+      const getISS = async () => {
+        const res = await fetch(api_url);
+        const data = await res.json();
+        const { latitude, longitude } = data;
+
+        marker.setLatLng([latitude, longitude]);
+
+        if (firstTime) {
+          map.setView([latitude, longitude], 5);
+          firstTime = false;
+        }
+
+        document.getElementById("lat").textContent = latitude.toFixed(2);
+        document.getElementById("log").textContent = longitude.toFixed(2);
+      };
+
+      getISS();
+
+      setInterval(getISS, 1000);
+    </script>
+  </body>
+</html>

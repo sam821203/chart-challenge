@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      .chartCard {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chartBox {
+        width: 1280px;
+        padding: 10px 20px;
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chartCard">
+      <div class="chartBox">
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const getData = async (api) => {
+        const xs = [];
+        const ys = [];
+        const response = await fetch(api);
+        const data = await response.text();
+
+        const table = data.split("\n").slice(1);
+
+        table.forEach((row) => {
+          const columns = row.split(",");
+          const year = columns[0];
+          const temp = columns[1];
+
+          xs.push(year);
+          ys.push(parseFloat(temp) + 14);
+        });
+
+        return { xs, ys };
+      };
+
+      const chartIt = async () => {
+        const dataZon = await getData("ZonAnn.Ts+dSST.csv");
+        const dataNH = await getData("NH.Ts+dSST.csv");
+        const dataSH = await getData("SH.Ts+dSST.csv");
+
+        const ctx = document.getElementById("myChart");
+        const myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: dataZon.xs,
+            datasets: [
+              {
+                label: "Zonal annual means in °C",
+                data: dataZon.ys,
+                borderWidth: 1,
+                pointRadius: 0,
+                borderColor: "rgba(54, 162, 235, 1)",
+                backgroundColor: "rgba(54, 162, 235, 0.2)",
+              },
+              {
+                label: "Southern Hemisphere-mean in °C",
+                data: dataNH.ys,
+                borderWidth: 1,
+                pointRadius: 0,
+                borderColor: "rgba(255, 99, 132, 1)",
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+              },
+              {
+                label: "Northern Hemisphere-mean in °C",
+                data: dataSH.ys,
+                borderWidth: 1,
+                pointRadius: 0,
+                borderColor: "rgba(255, 205, 86, 1)",
+                backgroundColor: "rgba(255, 205, 86, 0.2)",
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: {
+                ticks: {
+                  callback: function (value, index, ticks) {
+                    return value + "°";
+                  },
+                },
+              },
+            },
+          },
+        });
+      };
+
+      chartIt();
+    </script>
+  </body>
+</html>
